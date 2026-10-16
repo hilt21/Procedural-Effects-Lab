@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07121b">
+<title>Angular Light Lab | 45° Procedural Light Trails</title>
+<style>
+:root{color-scheme:dark;--gold:#ffce72;--muted:#88a1ae;--edge:rgba(141,179,196,.16);--panel:rgba(8,19,28,.89);--text:#eaf4f4}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050c13;color:var(--text);font-family:Inter,"SF Pro Display","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.scene{position:fixed;inset:0;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 59% 58%,rgba(15,50,63,.57),transparent 54%),linear-gradient(180deg,#080f18,#081b24 67%,#05111a)}
+.scene:before{content:"";position:absolute;inset:0;z-index:0;opacity:.26;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 88px,rgba(72,111,131,.065) 89px,transparent 90px),linear-gradient(180deg,transparent 68%,rgba(19,69,88,.25) 71%,transparent 100%)}
+.scene:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse at 55% 52%,transparent 24%,rgba(0,5,10,.56) 100%)}
+#canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block;cursor:crosshair}
+.chrome{pointer-events:none;position:absolute;inset:0;z-index:5}
+.chrome>*{pointer-events:auto}
+.topline{position:absolute;left:28px;right:30px;top:20px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:13px}.brandmark{width:34px;height:34px;position:relative;border:1px solid #d7b36f;transform:rotate(45deg);display:grid;place-items:center;opacity:.9}.brandmark:before,.brandmark:after{content:"";position:absolute;background:#efcb85}.brandmark:before{width:15px;height:1px}.brandmark:after{height:15px;width:1px}
+.brandtext b{display:block;letter-spacing:.17em;font-weight:650;font-size:13px}.brandtext small{display:block;color:#99adbb;letter-spacing:.22em;font-size:9px;margin-top:5px}
+.mast-right{display:flex;gap:20px;align-items:center;color:#b3c2c9;font:11px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.06em}.live{display:flex;align-items:center;gap:9px}.live:before{content:"";display:block;width:6px;height:6px;border-radius:50%;background:#ffca76;box-shadow:0 0 12px #ffcf80}
+.panel{position:absolute;left:24px;top:80px;bottom:26px;width:324px;max-height:calc(100dvh - 106px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--edge);background:var(--panel);backdrop-filter:blur(22px);border-radius:12px;box-shadow:0 16px 90px rgba(0,0,0,.29)}
+.panel-head{padding:23px 22px 15px;border-bottom:1px solid var(--edge);flex:none}
+.eyebrow{font-size:10px;font-weight:700;color:#e4bc76;letter-spacing:.22em}
+.panel-head h1{font-size:19px;margin:10px 0 9px;font-weight:580;letter-spacing:-.02em}.panel-head p{color:#91a7b5;margin:0;font-size:12px;line-height:1.75}
+.preset-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:17px}
+.preset{border:1px solid rgba(126,161,176,.23);background:rgba(255,255,255,.02);border-radius:6px;color:#9bb2bb;padding:9px 0;font-size:11px;letter-spacing:.07em;transition:.15s}
+.preset[aria-pressed=true]{color:#ffe4ae;background:rgba(245,183,81,.12);border-color:rgba(255,203,111,.51)}.preset:hover{border-color:#dfb778;color:#f4dbad}
+.controls{overflow-y:auto;padding:20px 22px 10px;scrollbar-width:thin;scrollbar-color:#415260 transparent;overscroll-behavior:contain;flex:1}
+.group-title{color:#a1b7c2;text-transform:uppercase;letter-spacing:.12em;font-size:10px;margin:0 0 16px;display:flex;align-items:center;gap:8px}.group-title:after{content:"";flex:1;height:1px;background:rgba(148,184,197,.13)}
+.control{margin-bottom:19px}.control.critical{padding:13px 13px 10px;border:1px solid rgba(239,187,103,.2);border-radius:8px;background:rgba(248,182,73,.038);margin-left:-5px;margin-right:-5px}
+.control-label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:11px;font-size:12px;color:#d9e5e8}.control-label output{color:#ffcd7b;font:12px ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
+input[type=range]{width:100%;display:block;margin:0;accent-color:#f7c777;cursor:pointer;height:5px;background:transparent}
+.range-notes{display:flex;justify-content:space-between;font:9px ui-monospace,monospace;color:#627d8b;margin-top:7px}
+.inset-help{color:#8a9fa9;font-size:10px;line-height:1.55;margin:10px 0 0}
+.sep{border:0;border-top:1px solid var(--edge);margin:22px 0 18px}
+.check{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#cedbe2;margin:0 0 14px;cursor:pointer}.check input{accent-color:#ffd086;width:16px;height:16px}
+.panel-foot{padding:15px 20px 19px;border-top:1px solid var(--edge);flex:none;background:rgba(0,0,0,.08)}
+.buttons{display:flex;gap:8px}.btn{flex:1;padding:12px;border:1px solid rgba(147,174,185,.28);background:rgba(255,255,255,.028);border-radius:7px;color:#dce8e9;font-size:12px}.btn-primary{background:rgba(250,193,98,.13);color:#ffe3ad;border-color:rgba(244,189,103,.49)}.btn:hover{filter:brightness(1.18)}
+.footnote{font-size:10px;color:#7c94a1;line-height:1.5;margin-top:11px}
+.stage-title{position:absolute;top:114px;right:42px;text-align:right;opacity:.9;pointer-events:none}
+.stage-title .num{font:11px ui-monospace,monospace;color:#a5bcc8;letter-spacing:.17em}.stage-title .heading{font-size:clamp(16px,2.1vw,31px);letter-spacing:.055em;font-weight:300;margin-top:8px;color:#d1e4e8}.stage-title .sub{font:10px ui-monospace,monospace;margin-top:9px;color:#c29e67;letter-spacing:.13em}
+.metrics{position:absolute;right:34px;bottom:33px;display:grid;grid-template-columns:repeat(3,minmax(75px,1fr));gap:10px;min-width:min(420px,calc(100vw - 390px));pointer-events:none}
+.metric{padding:13px 14px;border-top:1px solid rgba(165,191,202,.26);background:linear-gradient(180deg,rgba(7,20,28,.43),rgba(5,15,22,.04))}.metric .name{display:block;color:#7f9aa8;font-size:10px;letter-spacing:.12em}.metric strong{display:block;color:#f2d19a;font-size:21px;font-weight:350;margin-top:8px;font-variant-numeric:tabular-nums}.metric strong small{font-size:10px;color:#8da2ad;margin-left:3px}
+.emitter-label{position:absolute;z-index:4;color:#c2ad88;font:10px ui-monospace,monospace;letter-spacing:.16em;white-space:nowrap;transform:translate(47px,-5px);opacity:.6;pointer-events:none}
+.bottom-note{position:absolute;right:37px;bottom:140px;font:10px ui-monospace,monospace;letter-spacing:.06em;color:#91acb3;pointer-events:none;max-width:320px;text-align:right;line-height:1.9}.bottom-note span{color:#f1ce8b}
+.mobile-toggle{display:none}
+@media(max-height:660px) and (min-width:751px){.panel-head{padding-top:12px;padding-bottom:10px}.panel-head h1{margin:5px 0}.panel-head p{line-height:1.45}.preset-row{margin-top:10px}.panel{top:64px;max-height:calc(100dvh - 75px)}.controls{padding-top:12px}.topline{top:10px}.stage-title{top:80px}.metrics{bottom:16px}}
+@media(max-width:750px){.topline{left:20px;right:19px;top:18px}.brandtext b{font-size:12px}.brandmark{height:29px;width:29px}.mast-right .meta{display:none}.stage-title{right:19px;top:87px}.stage-title .heading{font-size:18px}.stage-title .sub{font-size:9px}.panel{left:12px;right:12px;top:auto;bottom:12px;width:auto;max-height:min(74dvh,650px);height:auto;border-radius:13px;transition:transform .25s ease;display:flex}.panel.collapsed{transform:translateY(calc(100% - 57px))}.panel-head{padding:12px 15px 12px;min-height:0}.panel-head h1,.panel-head p,.panel-head .eyebrow,.panel-head .preset-row{display:none}.mobile-toggle{display:flex;width:100%;justify-content:space-between;align-items:center;color:#e8d1a4;font-size:13px;font-weight:500;letter-spacing:.03em;border:0;background:transparent;padding:4px 0;cursor:pointer}.mobile-toggle small{color:#a7b9c2;font-size:11px}.controls{padding:14px 16px;min-height:260px}.panel-foot{padding:12px 15px}.metrics{top:181px;bottom:auto;right:15px;left:15px;min-width:0;gap:7px;grid-template-columns:repeat(3,1fr)}.metric{padding:8px 10px;min-width:0}.metric .name{font-size:9px}.metric strong{font-size:17px;margin-top:4px}.bottom-note{right:17px;bottom:calc(74dvh + 28px);max-width:220px;display:none}.emitter-label{font-size:9px}}
+@media(max-width:430px){.stage-title .heading{font-size:15px}.metrics{top:178px}.metric strong{font-size:16px}.brandtext small{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.panel{transition:none}}
+</style>
+</head>
+<body>
+<div class="scene"><canvas id="canvas" aria-label="45 度金色折线光轨动画"></canvas></div>
+<div class="chrome">
+ <header class="topline"><div class="brand"><span class="brandmark" aria-hidden="true"></span><div class="brandtext"><b>ANGULAR LIGHT LAB</b><small>PROCEDURAL LIGHT STUDY / 001</small></div></div><div class="mast-right"><span class="meta">WEB CANVAS EXPERIMENT</span><span class="live" id="liveLabel">LIVE RENDER</span></div></header>
+ <aside class="panel" id="panel" aria-label="光轨控制台">
+  <div class="panel-head"><button class="mobile-toggle" id="mobileToggle" aria-expanded="true" aria-controls="controls">参数控制台 <small id="mobileArrow">收起 ∨</small></button><div class="eyebrow">REAL-TIME CONTROLS</div><h1>程序化折线光轨</h1><p>每段保持精确 45°，向外定向传播。使用全局预算与网格限流。点击画面可重新定位光源。</p><div class="preset-row" role="group" aria-label="视觉密度预设"><button class="preset" data-preset="sparse" aria-pressed="false">01 克制</button><button class="preset" data-preset="balanced" aria-pressed="true">02 均衡</button><button class="preset" data-preset="burst" aria-pressed="false">03 爆发</button></div></div>
+  <div class="controls" id="controls">
+   <div class="group-title">01 / Population &amp; density</div>
+   <div class="control critical"><label class="control-label" for="maxTrails">屏幕光轨总数量 <output id="maxTrailsValue">22 条</output></label><input id="maxTrails" type="range" min="4" max="52" step="1" value="22"><div class="range-notes"><span>4</span><span>52</span></div><div class="inset-help">硬上限：计入生长中和残影尚未消失的光轨。</div></div>
+   <div class="control critical"><label class="control-label" for="density">区域光线密度 <output id="densityValue">42%</output></label><input id="density" type="range" min="10" max="95" step="1" value="42"><div class="range-notes"><span>稀疏</span><span>密集</span></div><div class="inset-help">同时调节全屏可见线长预算和网格局部容量。</div></div>
+   <hr class="sep"><div class="group-title">02 / Motion &amp; geometry</div>
+   <div class="control"><label class="control-label" for="speed">传播速度 <output id="speedValue">230 px/s</output></label><input id="speed" type="range" min="75" max="550" step="5" value="230"></div>
+   <div class="control"><label class="control-label" for="bend">折转概率 <output id="bendValue">67%</output></label><input id="bend" type="range" min="10" max="100" step="1" value="67"></div>
+   <div class="control"><label class="control-label" for="reflections">最大边界反射 <output id="reflectionsValue">2 次</output></label><input id="reflections" type="range" min="0" max="6" step="1" value="2"></div>
+   <hr class="sep"><div class="group-title">03 / Emissive shading</div>
+   <div class="control"><label class="control-label" for="glow">金色 Glow 强度 <output id="glowValue">62%</output></label><input id="glow" type="range" min="0" max="100" step="1" value="62"></div>
+   <div class="control"><label class="control-label" for="tail">拖尾可见时间 <output id="tailValue">3.2 s</output></label><input id="tail" type="range" min="8" max="65" step="1" value="32"></div>
+   <hr class="sep"><div class="group-title">04 / Validation</div>
+   <label class="check" for="heatmap">显示网格密度热力图 <input id="heatmap" type="checkbox"></label>
+   <label class="check" for="scaffold">显示 45° 方向参考线 <input id="scaffold" type="checkbox"></label>
+   <p class="inset-help">密度网格每约 100 ms 更新。金色区域接近容量上限；若预算不足，新路径将改向或停止生长。</p>
+  </div>
+  <div class="panel-foot"><div class="buttons"><button class="btn btn-primary" id="regenerate">↻ 重新生成</button><button class="btn" id="pause">Ⅱ 暂停</button></div><div class="footnote">所有光段均满足 |Δx| = |Δy|；镜面反射后仍保持 45°。</div></div>
+ </aside>
+ <div class="stage-title"><div class="num">EXPERIMENT / 001</div><div class="heading">DISCIPLINED CHAOS</div><div class="sub">45° SEGMENTS • DIRECTIONAL PERSISTENCE</div></div>
+ <div class="emitter-label" id="emitterLabel">SOURCE / 01</div>
+ <div class="bottom-note">GLOBAL BUDGET <span>+</span> SPATIAL CELL QUOTA <span>+</span> TRAIL DECAY<br>REFLECTIONS USE THE VIEWPORT AS A MIRROR</div>
+ <div class="metrics" aria-live="off"><div class="metric"><span class="name">VISIBLE TRAILS</span><strong id="visibleMetric">0<small>/22</small></strong></div><div class="metric"><span class="name">LENGTH BUDGET</span><strong id="budgetMetric">0<small>%</small></strong></div><div class="metric"><span class="name">PEAK CELL LOAD</span><strong id="peakMetric">0<small>%</small></strong></div></div>
+</div>
+<script>
+(() => {
+'use strict';
+const canvas=document.querySelector('#canvas'); const ctx=canvas.getContext('2d',{alpha:true});
+const ui={maxTrails:document.querySelector('#maxTrails'),density:document.querySelector('#density'),speed:document.querySelector('#speed'),bend:document.querySelector('#bend'),reflections:document.querySelector('#reflections'),glow:document.querySelector('#glow'),tail:document.querySelector('#tail'),heatmap:document.querySelector('#heatmap'),scaffold:document.querySelector('#scaffold')};
+const state={maxTrails:22,density:42,speed:230,bend:67,reflections:2,glow:62,tail:32,heatmap:false,scaffold:false};
+const SQ=Math.SQRT1_2, TAU=Math.PI*2; let W=1,H=1,dpr=1,emitter={x:0,y:0},cell=85,cols=1,rows=1,grid=new Float32Array(1),rays=[],particles=[],sparks=[],seed=84101,last=0,elapsed=0,spawnDebt=0,paused=window.matchMedia('(prefers-reduced-motion: reduce)').matches,visibleLength=0,peakLoad=0,spawnIndex=0,lastDensityCheck=-1, fps=60;
+const clip=(v,a,b)=>Math.max(a,Math.min(b,v));
+function random(){seed=(Math.imul(1664525,seed)+1013904223)>>>0;return seed/4294967296}
+function rand(a,b){return a+(b-a)*random()}
+function dist(x,y,x2,y2){return Math.hypot(x-x2,y-y2)}
+function maxLength(){return Math.hypot(W,H)*(0.67+3.2*state.density/100)}
+function cellCap(x,y){const near=dist(x,y,emitter.x,emitter.y)<105;return (1.12+3.5*state.density/100)*(near?2.65:1)}
+function at(x,y){const c=clip(Math.floor(x/cell),0,cols-1),r=clip(Math.floor(y/cell),0,rows-1);return r*cols+c}
+function updateLabels(){for(const [key,node] of Object.entries(ui))if(node.type==='range'){node.value=state[key];const format={maxTrails:v=>v+' 条',density:v=>v+'%',speed:v=>v+' px/s',bend:v=>v+'%',reflections:v=>v+' 次',glow:v=>v+'%',tail:v=>(v/10).toFixed(1)+' s'}[key];document.getElementById(key+'Value').textContent=format(state[key]);} ui.heatmap.checked=state.heatmap;ui.scaffold.checked=state.scaffold;}
+for(const [key,node] of Object.entries(ui)){node.addEventListener('input',()=>{state[key]=node.type==='checkbox'?node.checked:Number(node.value);if(key==='maxTrails')rays=rays.slice(-state.maxTrails);updateLabels();document.querySelectorAll('.preset').forEach(b=>b.setAttribute('aria-pressed','false'));});}
+const presets={sparse:{maxTrails:10,density:22,speed:175,bend:58,reflections:1,glow:47,tail:26},balanced:{maxTrails:22,density:42,speed:230,bend:67,reflections:2,glow:62,tail:32},burst:{maxTrails:36,density:76,speed:320,bend:82,reflections:3,glow:76,tail:42}};
+document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{Object.assign(state,presets[b.dataset.preset]);updateLabels();document.querySelectorAll('.preset').forEach(p=>p.setAttribute('aria-pressed',p===b?'true':'false'));reset(false)}));
+function reset(newSeed=true){if(newSeed)seed=(Date.now()^Math.floor(Math.random()*100000))>>>0;rays=[];sparks=[];grid.fill(0);visibleLength=0;peakLoad=0;spawnDebt=0;spawnIndex=0;lastDensityCheck=-1;}
+document.querySelector('#regenerate').addEventListener('click',()=>reset());
+const pauseButton=document.querySelector('#pause'),liveLabel=document.querySelector('#liveLabel');
+function updatePause(){pauseButton.textContent=paused?'▶ 继续':'Ⅱ 暂停';liveLabel.textContent=paused?'PAUSED':'LIVE RENDER'} updatePause();
+pauseButton.addEventListener('click',()=>{paused=!paused;updatePause()});
+const panel=document.querySelector('#panel'),mobileToggle=document.querySelector('#mobileToggle');
+function mobileInit(){if(window.innerWidth<=750){panel.classList.add('collapsed');mobileToggle.setAttribute('aria-expanded','false');document.querySelector('#mobileArrow').textContent='展开 ∧'}else{panel.classList.remove('collapsed');mobileToggle.setAttribute('aria-expanded','true')}}
+mobileToggle.addEventListener('click',()=>{const collapsed=panel.classList.toggle('collapsed');mobileToggle.setAttribute('aria-expanded',String(!collapsed));document.querySelector('#mobileArrow').textContent=collapsed?'展开 ∧':'收起 ∨'});
+function resize(){dpr=Math.min(window.devicePixelRatio||1,2);W=window.innerWidth;H=window.innerHeight;canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);emitter={x:W*(W<=750?.5:.595),y:H*(W<=750?.43:.545)};cell=clip(Math.round(Math.sqrt(W*H/125)),58,112);cols=Math.max(1,Math.ceil(W/cell));rows=Math.max(1,Math.ceil(H/cell));grid=new Float32Array(cols*rows);particles=Array.from({length:clip(Math.round(W*H/15000),30,95)},()=>({x:rand(0,W),y:rand(0,H),s:rand(.45,1.55),offset:rand(0,TAU),f:rand(.2,.8)}));const label=document.querySelector('#emitterLabel');label.style.left=emitter.x+'px';label.style.top=(emitter.y+36)+'px';reset(false)}
+window.addEventListener('resize',resize,{passive:true});
+canvas.addEventListener('pointerdown',e=>{emitter.x=clip(e.clientX,30,W-30);emitter.y=clip(e.clientY,30,H-30);const label=document.querySelector('#emitterLabel');label.style.left=emitter.x+'px';label.style.top=(emitter.y+36)+'px';reset(false)});
+function segmentOpacity(s,t){const age=t-(s.finishedAt??t);const ttl=state.tail*100;return age<0?1:clip(1-age/ttl,0,1)**1.65}
+function rayBudget(ray){return 4+Math.floor(random()*6)+(state.reflections>2?2:0)}
+function newRay(){if(rays.length>=state.maxTrails||visibleLength>=maxLength()*.91)return;
+ const dir=spawnIndex++%4;const headingAxis=dir%2===0?'x':'y',forward=dir===0||dir===1?1:-1;
+ // Ordering: E, S, W, N. Every segment uses (+/-1, +/-1)/sqrt(2).
+ const sx=headingAxis==='x'?forward:(random()<.5?1:-1),sy=headingAxis==='y'?forward:(random()<.5?1:-1);
+ const r=rand(11,35),ang=rand(0,TAU);const ray={x:emitter.x+Math.cos(ang)*r,y:emitter.y+Math.sin(ang)*r,sx,sy,headingAxis,headingSign:forward,baseX:emitter.x,baseY:emitter.y,active:true,current:null,segments:[],bounces:0,limit:rayBudget(),started:elapsed,energy:rand(.74,1.07),hue:rand(-3,10),cause:null};
+ if(planNext(ray,true)){rays.push(ray);for(let k=0;k<2;k++)sparks.push({x:ray.x,y:ray.y,life:1,s:rand(2,7)})}
+}
+function preview(x,y,sx,sy,L){const vx=sx*SQ,vy=sy*SQ,pad=6;
+ const hx=vx>0?(W-pad-x)/vx:(pad-x)/vx,hy=vy>0?(H-pad-y)/vy:(pad-y)/vy;
+ const boundary=Math.max(0,Math.min(hx,hy));const travel=Math.min(L,boundary);
+ return{x:x+vx*travel,y:y+vy*travel,length:travel,wall:boundary<L-.00001?(hx<hy?'x':'y'):null,sx,sy};
+}
+function scanCost(x,y,target){let maximum=0,total=0,samples=0;const steps=Math.max(2,Math.ceil(target.length/16));
+ for(let i=1;i<=steps;i++){const f=i/steps,px=x+(target.x-x)*f,py=y+(target.y-y)*f,load=grid[at(px,py)]/cellCap(px,py);maximum=Math.max(maximum,load);total+=load;samples++}
+ return maximum*.8+(total/Math.max(1,samples))*.2;
+}
+function planNext(ray,initial=false,forced=null){if(ray.segments.length>=ray.limit)return false;
+ const size=clip(Math.hypot(W,H)/1300,.75,1.2),L=rand(51,133)*size;
+ let options=[];
+ if(forced){options=[[forced.sx,forced.sy]]}
+ else if(initial){options=[[ray.sx,ray.sy]]}
+ else{const first=ray.headingAxis==='x'?[ray.headingSign,ray.sy]:[ray.sx,ray.headingSign];const flip=ray.headingAxis==='x'?[ray.headingSign,-ray.sy]:[-ray.sx,ray.headingSign];
+ // Directional persistence: every candidate preserves the heading-axis sign.
+ const currentDrift=ray.headingAxis==='x'?ray.y-ray.baseY:ray.x-ray.baseX;
+ const nextDrift=ray.headingAxis==='x'?flip[1]:flip[0];
+ const wantsRecenter=Math.abs(currentDrift)>105&&Math.sign(currentDrift)!==Math.sign(nextDrift);
+ const preferBend=wantsRecenter||random()*100<state.bend;
+ options=preferBend?[flip,first]:[first,flip];}
+ let best=null,score=Infinity;
+ for(const [sx,sy] of options){const c=preview(ray.x,ray.y,sx,sy,L);if(c.length<8)continue;
+ const cost=scanCost(ray.x,ray.y,c)+(visibleLength+c.length)/Math.max(1,maxLength())*.10;
+ if(cost<score){best=c;score=cost}if(cost<.73)break;
+ }
+ // A soft length preview and a hard local admission threshold, not random wandering.
+ if(!best||score>1.065||visibleLength>maxLength()*1.02)return false;
+ ray.sx=best.sx;ray.sy=best.sy;ray.current={x1:ray.x,y1:ray.y,x2:ray.x,y2:ray.y,len:best.length,used:0,sx:ray.sx,sy:ray.sy,wall:best.wall,finishedAt:null};ray.segments.push(ray.current);return true;
+}
+function reflect(sx,sy,axis){let vx=sx*SQ,vy=sy*SQ;const nx=axis==='x'?1:0,ny=axis==='y'?1:0;const dot=vx*nx+vy*ny;vx-=2*dot*nx;vy-=2*dot*ny;return{sx:vx>=0?1:-1,sy:vy>=0?1:-1}}
+function advance(ray,distanceLeft){let guard=0;
+ while(distanceLeft>0.001&&ray.active&&guard++<10){const s=ray.current;if(!s){ray.active=false;break}
+ const movement=Math.min(distanceLeft,s.len-s.used);s.used+=movement;s.x2=s.x1+s.sx*SQ*s.used;s.y2=s.y1+s.sy*SQ*s.used;ray.x=s.x2;ray.y=s.y2;distanceLeft-=movement;
+ if(s.used>=s.len-.001){s.finishedAt=elapsed;ray.current=null;
+ if(s.wall){if(ray.bounces>=state.reflections){ray.active=false;break}const reflected=reflect(ray.sx,ray.sy,s.wall);ray.bounces++;
+ if(ray.headingAxis===s.wall)ray.headingSign*=-1;
+ sparks.push({x:ray.x,y:ray.y,life:1,s:rand(8,17),ring:true});
+ if(!planNext(ray,false,reflected))ray.active=false;
+ }else if(!planNext(ray,false))ray.active=false;
+ }
+ }
+}
+function calculateDensity(){grid.fill(0);visibleLength=0;let visible=0;
+ for(const r of rays){for(const s of r.segments){const a=segmentOpacity(s,elapsed);if(a<=.025)continue;const L=Math.hypot(s.x2-s.x1,s.y2-s.y1);if(L<1)continue;visibleLength+=L*a;visible++;
+ const count=Math.max(1,Math.ceil(L/12)),amount=L/count/cell*a;for(let j=0;j<count;j++){const f=(j+.5)/count,x=s.x1+(s.x2-s.x1)*f,y=s.y1+(s.y2-s.y1)*f;grid[at(x,y)]+=amount;}}
+ }
+ peakLoad=0;for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const cx=Math.min(W,(x+.5)*cell),cy=Math.min(H,(y+.5)*cell);if(dist(cx,cy,emitter.x,emitter.y)<110)continue;peakLoad=Math.max(peakLoad,grid[y*cols+x]/cellCap(cx,cy));}
+ const budget=maxLength();
+ // Low-density settings take effect immediately; prefer removing old ghosts.
+ if(visibleLength>budget){rays.sort((a,b)=>(a.active?1:0)-(b.active?1:0)||a.started-b.started);let i=0;while(visibleLength>budget*.95&&rays.length>1&&i++<10){const gone=rays.shift();for(const s of gone.segments)visibleLength-=Math.hypot(s.x2-s.x1,s.y2-s.y1)*segmentOpacity(s,elapsed)} }
+ rays=rays.filter(r=>r.active||r.segments.some(s=>segmentOpacity(s,elapsed)>.025));
+ if(rays.length>state.maxTrails)rays.splice(0,rays.length-state.maxTrails);
+ const fmt=(id,value)=>document.querySelector('#'+id).innerHTML=value;
+ fmt('visibleMetric',`${rays.length}<small>/${state.maxTrails}</small>`);
+ fmt('budgetMetric',`${Math.round(100*visibleLength/Math.max(1,budget))}<small>%</small>`);
+ fmt('peakMetric',`${Math.round(100*peakLoad)}<small>%</small>`);
+}
+function drawEnvironment(t){const horizon=H*.70;
+ ctx.save();ctx.lineWidth=1;const g=ctx.createLinearGradient(0,H*.60,0,H);g.addColorStop(0,'rgba(22,76,91,0)');g.addColorStop(.6,'rgba(24,66,80,.19)');g.addColorStop(1,'rgba(17,42,57,.09)');ctx.fillStyle=g;ctx.fillRect(0,horizon,W,H-horizon);
+ // Nearly invisible architectural arches and floor perspective references.
+ ctx.strokeStyle='rgba(75,137,152,.073)';for(const side of[-1,1]){const cx=emitter.x+side*Math.min(W*.35,420);const wid=Math.min(W*.11,135);ctx.beginPath();ctx.moveTo(cx-wid,H*.10);ctx.lineTo(cx-wid,H*.49);ctx.quadraticCurveTo(cx-wid,H*.06,cx,H*.085);ctx.quadraticCurveTo(cx+wid,H*.06,cx+wid,H*.49);ctx.stroke();ctx.beginPath();ctx.moveTo(cx-wid*1.15,H*.075);ctx.lineTo(cx-wid*1.15,H*.57);ctx.moveTo(cx+wid*1.15,H*.075);ctx.lineTo(cx+wid*1.15,H*.57);ctx.stroke()}
+ ctx.strokeStyle='rgba(122,188,207,.048)';for(let i=-7;i<=7;i++){const x=emitter.x+i*W*.11;ctx.beginPath();ctx.moveTo(x,horizon);ctx.lineTo(emitter.x+i*W*.47,H);ctx.stroke()}
+ for(let j=1;j<7;j++){const frac=j/7, y=horizon+(H-horizon)*frac*frac;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ ctx.restore();}
+function drawHeatmap(){ctx.save();for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const cx=(x+.5)*cell,cy=(y+.5)*cell,k=clip(grid[y*cols+x]/cellCap(cx,cy),0,1.8);if(k<.04)continue;const red=Math.round(48+190*clip(k,0,1)),green=Math.round(100+81*(1-Math.abs(k-.7)));ctx.fillStyle=`rgba(${red},${green},64,${Math.min(.3,k*.26)})`;ctx.fillRect(x*cell+1,y*cell+1,Math.min(cell,W-x*cell)-2,Math.min(cell,H-y*cell)-2)}ctx.strokeStyle='rgba(176,206,213,.10)';ctx.lineWidth=.6;for(let x=0;x<=cols;x++){ctx.beginPath();ctx.moveTo(x*cell,0);ctx.lineTo(x*cell,H);ctx.stroke()}for(let y=0;y<=rows;y++){ctx.beginPath();ctx.moveTo(0,y*cell);ctx.lineTo(W,y*cell);ctx.stroke()}ctx.restore()}
+function drawScaffold(){ctx.save();ctx.setLineDash([5,9]);ctx.lineWidth=.8;ctx.strokeStyle='rgba(121,160,174,.23)';for(const sx of[-1,1])for(const sy of[-1,1]){ctx.beginPath();ctx.moveTo(emitter.x,emitter.y);ctx.lineTo(emitter.x+sx*Math.max(W,H),emitter.y+sy*Math.max(W,H));ctx.stroke()}ctx.setLineDash([]);ctx.restore()}
+function drawMotes(t){ctx.save();for(const p of particles){const x=p.x+Math.sin(t*.23+p.offset)*9,y=p.y+Math.cos(t*.19+p.offset)*6,a=.19+.33*(.5+.5*Math.sin(t*p.f+p.offset));ctx.beginPath();ctx.fillStyle=`rgba(112,213,227,${a})`;ctx.arc(x,y,p.s,0,TAU);ctx.fill()}ctx.restore()}
+function drawEmitter(t){const x=emitter.x,y=emitter.y,breathe=.5+.5*Math.sin(t*1.4);
+ ctx.save();ctx.globalCompositeOperation='lighter';let radial=ctx.createRadialGradient(x,y,0,x,y,97);radial.addColorStop(0,'rgba(255,218,136,.21)');radial.addColorStop(.22,'rgba(248,181,68,.09)');radial.addColorStop(1,'rgba(236,155,50,0)');ctx.fillStyle=radial;ctx.beginPath();ctx.arc(x,y,97,0,TAU);ctx.fill();ctx.strokeStyle=`rgba(253,203,124,${.24+breathe*.10})`;ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y,23+breathe*2,0,TAU);ctx.stroke();ctx.strokeStyle='rgba(255,226,154,.38)';for(let i=0;i<8;i++){const a=i*Math.PI/4,inner=29,outer=i%2?39:48;ctx.beginPath();ctx.moveTo(x+Math.cos(a)*inner,y+Math.sin(a)*inner);ctx.lineTo(x+Math.cos(a)*outer,y+Math.sin(a)*outer);ctx.stroke()}ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.strokeStyle='rgba(255,229,166,.85)';ctx.lineWidth=1.1;ctx.strokeRect(-9,-9,18,18);ctx.strokeStyle='rgba(234,190,101,.4)';ctx.strokeRect(-15,-15,30,30);ctx.restore();ctx.fillStyle='#ffebb9';ctx.beginPath();ctx.arc(x,y,3,0,TAU);ctx.fill();ctx.restore()}
+function drawTrails(t){ctx.save();ctx.lineCap='butt';ctx.lineJoin='miter';ctx.globalCompositeOperation='lighter';
+ for(const ray of rays){for(const s of ray.segments){const opacity=segmentOpacity(s,elapsed)*ray.energy;if(opacity<.018)continue;
+ const length=Math.hypot(s.x2-s.x1,s.y2-s.y1);if(length<.2)continue;const o=opacity;
+ ctx.beginPath();ctx.moveTo(s.x1,s.y1);ctx.lineTo(s.x2,s.y2);
+ ctx.shadowBlur=0;ctx.lineWidth=9.5*state.glow/100;ctx.strokeStyle=`rgba(255,174,52,${o*.095*state.glow/65})`;ctx.stroke();
+ ctx.shadowBlur=0;ctx.lineWidth=2.6;ctx.strokeStyle=`rgba(255,189,82,${o*.51})`;ctx.stroke();
+ ctx.lineWidth=1.05;ctx.strokeStyle=`rgba(255,240,184,${o*.93})`;ctx.stroke();
+ }}
+ // Moving bright fronts, separate from the decaying body.
+ for(const ray of rays){if(!ray.active)continue;const x=ray.x,y=ray.y;const g=ctx.createRadialGradient(x,y,0,x,y,24);g.addColorStop(0,'rgba(255,255,231,.87)');g.addColorStop(.08,'rgba(255,227,153,.66)');g.addColorStop(.36,'rgba(255,186,65,.15)');g.addColorStop(1,'rgba(255,181,63,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,24,0,TAU);ctx.fill();ctx.fillStyle='rgba(255,244,195,.93)';ctx.beginPath();ctx.arc(x,y,1.55,0,TAU);ctx.fill()}
+ for(const spark of sparks){const a=clip(spark.life,0,1);ctx.beginPath();ctx.arc(spark.x,spark.y,spark.s*(1.2-a),0,TAU);if(spark.ring){ctx.lineWidth=.9;ctx.strokeStyle=`rgba(255,213,118,${a*.5})`;ctx.stroke()}else{ctx.fillStyle=`rgba(255,209,102,${a*.15})`;ctx.fill()}}
+ ctx.restore()}
+function animate(ts){if(!last)last=ts;let dt=clip((ts-last)/1000,0,.045);last=ts;fps=fps*.92+.08*(1/Math.max(dt,.001));
+ if(!paused){elapsed+=dt*1000;spawnDebt+=dt*(1.5+state.density*.088);for(let i=0;i<6&&spawnDebt>=1;i++,spawnDebt--)newRay();for(const ray of rays)if(ray.active)advance(ray,state.speed*dt);for(const s of sparks)s.life-=dt*1.15;sparks=sparks.filter(s=>s.life>0);if(elapsed-lastDensityCheck>=90){calculateDensity();lastDensityCheck=elapsed}}
+ ctx.clearRect(0,0,W,H);const t=elapsed/1000;drawEnvironment(t);drawMotes(t);if(state.heatmap)drawHeatmap();if(state.scaffold)drawScaffold();drawTrails(t);drawEmitter(t);
+ requestAnimationFrame(animate)}
+resize();mobileInit();updateLabels();requestAnimationFrame(animate);
+// Read-only inspection surface for reproducible browser QA.
+window.__lightLab={stats:()=>({count:rays.length,max:state.maxTrails,globalLength:visibleLength,budget:maxLength(),peakLoad,cellSize:cell,gridCols:cols,gridRows:rows,fps:Math.round(fps),completedReflections:rays.reduce((n,r)=>n+r.bounces,0),paused}),segments:()=>rays.flatMap(r=>r.segments.map(s=>({dx:s.x2-s.x1,dy:s.y2-s.y1,wall:s.wall,active:s.finishedAt===null}))),settings:()=>({...state}),rayPaths:()=>rays.map(r=>({bounces:r.bounces,segments:r.segments.map(s=>({x1:s.x1,y1:s.y1,x2:s.x2,y2:s.y2,sx:s.sx,sy:s.sy,wall:s.wall,finished:s.finishedAt!==null}))}))};
+})();
+</script>
+</body>
+</html>
