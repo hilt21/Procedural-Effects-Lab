@@ -9,16 +9,18 @@ export const create: Factory = (canvas, initial, initialSeed) => {
   let p = { ...initial };
   let seed = initialSeed, t = 0, w = 1, h = 1, dpr = 1;
   let visible = 0, densityPeak = 0;
+  let dynamicCap = 26000, renderCost = 0, renderFrames = 0;
   const bucket: Dot[][] = [[], [], [], [], [], []];
   const palette = ["#a8bec2", "#bed1d3", "#d4dfe1", "#e0e8e9", "#ecf2f2", "#f8ffff"];
   const TAU = Math.PI * 2;
   const render = () => {
+    const start = performance.now();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalCompositeOperation = "source-over";
     ctx.globalAlpha = 1;
     ctx.fillStyle = "#05070a";
     ctx.fillRect(0, 0, w, h);
-    const count = Math.min(Math.round(p.count), w < 520 ? 24000 : 50000);
+    const count = Math.min(Math.round(p.count), Math.round(dynamicCap));
     const scale = Math.min(w / 3.5, h / (Math.round(p.shape) === 2 ? 2.75 : 3.15));
     const angle = t * TAU / LIFEFORM_PERIOD, drift = p.drift / 100;
     const centerX = w * 0.5 + 0.16 * drift * scale * Math.sin(angle);
@@ -59,6 +61,16 @@ export const create: Factory = (canvas, initial, initialSeed) => {
       }
     }
     ctx.globalAlpha = 1;
+    renderCost += performance.now() - start;
+    renderFrames++;
+    if (renderFrames >= 12) {
+      const ms = renderCost / renderFrames;
+      const factor = ms > 33 ? 0.85 : ms < 18 ? 1.08 : 1;
+      const ceiling = Math.min(p.count, w < 520 ? 18000 : 50000);
+      dynamicCap = clamp(Math.round(dynamicCap * factor), Math.min(8000, ceiling), ceiling);
+      renderCost = 0;
+      renderFrames = 0;
+    }
   };
   return {
     update(next) {
@@ -71,6 +83,9 @@ export const create: Factory = (canvas, initial, initialSeed) => {
     resize(W, H, pixelRatio) {
       w = Math.max(1, W);
       h = Math.max(1, H);
+      dynamicCap = w < 520 ? 14000 : 26000;
+      renderCost = 0;
+      renderFrames = 0;
       dpr = Math.min(1.5, Math.max(1, pixelRatio));
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
@@ -78,7 +93,7 @@ export const create: Factory = (canvas, initial, initialSeed) => {
     },
     reset(nextSeed) { seed = nextSeed; t = 0; },
     metrics() {
-      return { items: visible, load: visible / Math.max(1, Math.min(p.count, w < 520 ? 24000 : 50000)),
+      return { items: visible, load: visible / Math.max(1, Math.min(p.count, dynamicCap)),
         peak: densityPeak };
     },
     destroy() {
