@@ -9,6 +9,15 @@ Explore, tune, and reproduce browser visual effects. A static React + TypeScript
 | Angular light trails | Canvas 2D | Exact 45° paths, directional persistence, viewport reflection, global and local geometry budgets |
 | Flow field particles | Canvas 2D | Seeded particles, procedural vector fields, cell occupancy, trails                               |
 | Chromatic drift      | WebGL     | Fullscreen fragment shader, color fields, warp, grain, static fallback                           |
+| Procedural lifeforms | Canvas 2D | Three original parametric lifeforms, looping motions, local particle budgets, and morphology search |
+
+## Procedural lifeforms
+
+The fourth experiment contains three connected capabilities: procedural morphology generation (jellyfish, anemone, fish), periodic local motion plus a closed global path, and seeded morphology exploration with a diversity-aware heuristic. Six generated candidates can be previewed and applied as normal shareable experiment parameters.
+
+Users may optionally select a local reference image. The browser estimates its foreground width-to-height ratio from color contrast with the corners. The photo is neither sent to a server nor embedded in URLs or JSON. It cannot recover anatomical structure, determine semantic species, or guarantee faithful reconstruction. Candidate scores are heuristic, not AI-generated aesthetic rankings. Low-contrast or cluttered images can fail, and the interface reports this.
+
+**Inspiration:** [@yuruyurau](https://x.com/yuruyurau?s=21) and the broader mathematical-generative-art tradition. All geometry and motion formulas here were independently written, with no copying of original sketch code.
 
 ## Development
 
@@ -43,6 +52,7 @@ Share links and JSON contain schema version, effect ID, effect version, seed, an
 - Particle density is based on particle centers, not accumulated trail brightness. The vector field is procedural, not a physical fluid solver.
 - Shader code uses native WebGL without Three.js or R3F. Unsupported or lost WebGL contexts display a static CSS gradient.
 - DPR is capped at 1.5. The directory uses static posters and never runs all experiments at once.
+- Lifeform loops close at twelve seconds at 50% playback speed. Shape generation is two-dimensional and intentionally nonphysical; a per-cell particle cap limits visual accumulation. A selected photo is transient and does not persist across page reloads.
 
 ## Verification
 
@@ -50,4 +60,4 @@ See [QA report](docs/QA_REPORT.md) for verified checks, an environment blocker, 
 
 ## License
 
-Project source: MIT. React and React DOM: MIT. The three new modular effects are independently implemented; no React Bits, Vanta, tsParticles, VFX-JS, or ShaderGradient components were copied.
+Project source: MIT. React and React DOM: MIT. The modular effects are independently implemented; no React Bits, Vanta, tsParticles, VFX-JS, or ShaderGradient components were copied.

@@ -9,6 +9,7 @@ import {
 } from "./registry";
 import { runEffect, type Effect, type Metrics, type Params } from "./core";
 import "./style.css";
+import { LifeformsExplorer } from "./LifeformsExplorer";
 const repo = "https://github.com/hilt21/Procedural-Effects-Lab";
 const initial = () => {
   try {
@@ -58,6 +59,29 @@ function Poster({ id }: { id: string }) {
               fill="none"
             />
           ))}
+        </svg>
+      ) : id === "procedural-lifeforms" ? (
+        <svg viewBox="0 0 400 230">
+          <defs>
+            <radialGradient id="life-glow">
+              <stop stopColor="#a1f5ed" stopOpacity=".2" />
+              <stop offset="1" stopColor="#a1f5ed" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <circle cx="200" cy="120" r="100" fill="url(#life-glow)" />
+          {Array.from({ length: 65 }, (_, i) => {
+            const x = 110 + i * 2.8;
+            const r = (x - 200) / 96;
+            const y = 120 - 55 * Math.sqrt(Math.max(0, 1 - r * r));
+            return <circle key={i} cx={x} cy={y} r="1.2" fill="#a4efe9"
+              opacity={.25 + .65 * Math.sin(i * 0.6) ** 2} />;
+          })}
+          {Array.from({ length: 26 }, (_, i) => {
+            const x = 135 + i * 5;
+            return <path key={i} d={`M${x} 116 Q${x + Math.sin(i * 2) * 18} 165 ${x + Math.sin(i * 2.2) * 10} 211`}
+              fill="none" stroke="#a4efe9" strokeWidth={0.5 + (i % 4) * .2}
+              strokeOpacity={.25 + (i % 5) * .12} />;
+          })}
         </svg>
       ) : (
         <div className="gradient-poster" />
@@ -240,7 +264,7 @@ function App() {
     if (snapshot)
       setSnapshot({ ...snapshot, params: { ...snapshot.params, [key]: v } });
   };
-  const categories = ["全部实验", ...experiments.map((e) => e.category)];
+  const categories = ["全部实验", ...new Set(experiments.map((e) => e.category))];
   const filtered = experiments.filter(
     (e) =>
       (category === "全部实验" || e.category === category) &&
@@ -259,7 +283,7 @@ function App() {
         </button>
         <nav>
           <button className={!selected ? "nav-active" : ""} onClick={back}>
-            实验目录 <span>03</span>
+            实验目录 <span>{String(experiments.length).padStart(2, "0")}</span>
           </button>
           <a href={repo} target="_blank" rel="noreferrer">
             GitHub ↗
@@ -305,7 +329,7 @@ function App() {
                     onClick={() => setCategory(c)}
                   >
                     {c}
-                    {c === "全部实验" && <small>3</small>}
+                    {c === "全部实验" && <small>{experiments.length}</small>}
                   </button>
                 ))}
               </div>
@@ -417,7 +441,7 @@ function App() {
                 <span>
                   {selected.id === "angular-light"
                     ? "点击画面移动光源"
-                    : "固定时间步 · 1 / 60 s"}
+                    : selected.id === "procedural-lifeforms" ? "12 s 周期 · 自动形态生成" : "固定时间步 · 1 / 60 s"}
                 </span>
                 <button onClick={() => setPaused((v) => !v)}>
                   {paused ? "▶ 继续" : "Ⅱ 暂停"}
@@ -516,7 +540,7 @@ function App() {
             </div>
             <div>
               <span>
-                {selected.id === "flow-field" ? "PARTICLES" : "VISIBLE OBJECTS"}
+                {selected.id === "flow-field" || selected.id === "procedural-lifeforms" ? "PARTICLES" : "VISIBLE OBJECTS"}
               </span>
               <strong>{metrics.items}</strong>
             </div>
@@ -537,6 +561,18 @@ function App() {
               </strong>
             </div>
           </div>
+          {selected.id === "procedural-lifeforms" && snapshot && (
+            <LifeformsExplorer
+              snapshot={snapshot}
+              onNotice={setNotice}
+              onSelect={(nextParams, nextSeed) => {
+                setSnapshot({ ...snapshot, params: { ...nextParams }, seed: nextSeed });
+                setRevision((x) => x + 1);
+                setNotice("已应用候选形态。点击「分享参数」可保存形态和随机种子。");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            />
+          )}
           <section className="documentation">
             <div className="tabs">
               {["原理", "使用与复现", "源码与许可"].map((t) => (
@@ -583,7 +619,7 @@ function App() {
                 <div>
                   <h3>独立模块，开放阅读</h3>
                   <p>
-                    三个实验均为本项目独立实现，未复制调研项目组件。渲染代码与
+                    所有实验均为本项目独立实现，未复制调研项目组件。渲染代码与
                     React 界面分离。
                   </p>
                   <a
@@ -600,6 +636,11 @@ function App() {
                     项目代码采用 MIT。运行时依赖 React 与 React DOM，许可证均为
                     MIT。渐变直接调用 WebGL，无第三方渲染依赖。原始 HTML
                     基线保留在 baseline 目录。
+                    {selected.id === "procedural-lifeforms" && (
+                      <> 本实验受到 <a href="https://x.com/yuruyurau?s=21"
+                        target="_blank" rel="noreferrer">@yuruyurau</a> 的数学动画启发，
+                        几何公式和渲染实现独立创作。</>
+                    )}
                   </p>
                 </div>
               </div>
@@ -620,7 +661,7 @@ function App() {
           <b>✳</b> PROCEDURAL EFFECTS LAB
         </span>
         <span>
-          持续探索中 <i /> 3 个独立实验
+          持续探索中 <i /> {experiments.length} 个独立实验
         </span>
         <a href={repo} target="_blank" rel="noreferrer">
           查看源码 ↗
