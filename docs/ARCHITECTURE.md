@@ -56,3 +56,13 @@ Vite emits a static `dist` with separate lazy effect chunks. Relative asset URLs
 ### Verification constraints
 
 Tests cover seed determinism, morphology and swim loop closure, candidate diversity/bounds, snapshot round trips, and approximate silhouette extraction. They do not prove biological fidelity, aesthetic quality, actual GPU/mobile FPS, or cross-browser layout. Browser QA remains necessary.
+
+
+## Index-space interference renderer (2026-10)
+
+- `effects/lifeforms-interference.ts`: pure deterministic index-space transformation and shared Canvas painter used by the full-size renderer and candidate previews.
+- `effects/lifeforms.ts`: dispatches `shape >= 4` to the index-space algorithm while preserving legacy 3D parametric species at shapes 0-3.
+- `registry.ts`: two new presets, preserved integer snapshot schema and original legacy shape IDs.
+- Spatial interference mode avoids local occupancy rejection to preserve bright folds, and uses alpha accumulation plus globally adaptive point count. Cell measurements are diagnostic, not a hard brightness constraint.
+- A constant normalized index domain prevents level-of-detail changes from altering global geometry. All runtime formula phases close after 12s, with tests for zero-to-period continuity.
+- The approach is an original mathematical implementation informed by general public creative coding mechanisms. Do not copy individual artists' formulas into this open-source project without appropriate permission.
