@@ -90,7 +90,7 @@ export function sampleLifeform(i: number, n: number, p: Params, seconds: number,
         + 0.11 * sway * q * Math.cos(phase * 2 - 5 * q + strand * 0.22 + gene);
       y = 0.36 - q * p.length * (1.1 + 0.58 * (strand % 11) / 11);
     }
-  } else {
+  } else if (shape === 2) {
     const bodyEnd = Math.floor(n * 0.7);
     if (i < bodyEnd) {
       const nr = 150, az = TAU * (i % nr) / nr;
@@ -112,8 +112,51 @@ export function sampleLifeform(i: number, n: number, p: Params, seconds: number,
         + 0.18 * sway * Math.sin(phase * 3 - v * 3 + strand * 0.05);
       z = (0.05 + 0.18 * v) * Math.sin(az);
     }
+
+  } else {
+    // Sinuous abstract organism: woven mantle around an undulating axis and
+    // hundreds of coherent, phase-delayed bristles. All motion frequencies
+    // are integral multiples of a shared period.
+    const spine = (u: number) => ({
+      x: 0.33 * Math.sin(u * 7 + phase) + 0.18 * Math.sin(u * 15 - 2 * phase + gene),
+      y: (u - 0.5) * 2.35 * p.length,
+      z: 0.21 * Math.cos(u * 9 - 2 * phase),
+    });
+    const mantleEnd = Math.floor(n * 0.62);
+    if (i < mantleEnd) {
+      const meridians = 152;
+      const u = Math.min(1, Math.floor(i / meridians) / Math.max(1, mantleEnd / meridians - 1));
+      const az = TAU * (i % meridians) / meridians;
+      const mid = spine(u), envelope = Math.sin(Math.PI * u) ** 0.7;
+      const wrinkle = 1 + 0.15 * pulse * Math.sin(u * 23 - 3 * phase + gene)
+        + 0.07 * Math.sin(az * 9 + u * 34 + phase * 2);
+      const radius = (0.09 + 0.31 * envelope) * p.spread * wrinkle;
+      const theta = az + u * TAU * 1.5 + 0.17 * Math.sin(phase + u * 12);
+      x = mid.x + radius * Math.cos(theta);
+      z = mid.z + radius * 0.75 * Math.sin(theta);
+      y = mid.y + 0.07 * Math.sin(az * 12 + u * 25 - phase * 2) * envelope;
+    } else {
+      group = 2;
+      const j = i - mantleEnd, strands = 109;
+      const strand = j % strands;
+      const v = Math.min(1, Math.floor(j / strands) / Math.max(1, (n - mantleEnd) / strands - 1));
+      const origin = 0.08 + 0.84 * ((strand * 0.61803398875) % 1);
+      const az = TAU * ((strand * 0.381966011) % 1);
+      const mid = spine(origin);
+      const reach = (0.4 + 0.7 * ((strand * 7 % 19) / 19)) * p.spread;
+      const sign = strand % 3 === 0 ? -1 : 1;
+      const bend = 0.15 * Math.sin(phase * 2 + strand * 0.47 - v * 9 + gene * 0.1)
+        * v * v * sway;
+      x = mid.x + (0.1 + v * reach) * Math.cos(az) + bend
+        + 0.1 * Math.sin(v * 8 + phase * 2 + strand) * v;
+      z = mid.z + (0.1 + v * reach) * Math.sin(az) * 0.8
+        + 0.12 * sway * v * Math.cos(phase * 2 - v * 8 + strand * 0.4);
+      y = mid.y + sign * v * (0.3 + 0.7 * ((strand * 13 % 31) / 31)) * p.length
+        + 0.12 * sway * v * Math.sin(phase * 2 - v * 6 + strand * 0.45);
+    }
   }
-  const ry = 0.35 * Math.cos(phase) + 0.14, rx = -0.17 * Math.sin(phase);
+  const ry = (shape === 3 ? 0.38 : 0.35) * Math.cos(phase) + (shape === 3 ? 0.1 : 0.14),
+    rx = (shape === 3 ? 0.21 : -0.17) * Math.sin(phase);
   const X = x * Math.cos(ry) + z * Math.sin(ry);
   const Z = -x * Math.sin(ry) + z * Math.cos(ry);
   return { x: X, y: y * Math.cos(rx) - Z * Math.sin(rx),
