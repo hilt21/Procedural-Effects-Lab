@@ -11,7 +11,8 @@ function Preview({ candidate }: { candidate: MorphologyCandidate }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const el = canvas.current;
-    const ctx = el?.getContext("2d");
+    if (!el) return;
+    const ctx = el.getContext("2d");
     if (!ctx) return;
     const width = 200, height = 130;
     el.width = width * 2;
