@@ -157,7 +157,7 @@ export const experiments: Experiment[] = [
       },
     ],
     load: () => import("./effects/gradient"),
-  },,
+  },
   {
     id: "procedural-lifeforms",
     number: "04",
