@@ -459,7 +459,7 @@ function App() {
                 <h2>实验参数</h2>
                 <span>PARAMETERS</span>
               </div>
-              <div className="preset-row">
+              <div className={"preset-row" + (selected.id === "procedural-lifeforms" ? " preset-lifeforms" : "")}>
                 {selected.presets.map((p) => (
                   <button
                     key={p.name}
@@ -483,7 +483,7 @@ function App() {
                     {c.label}
                     <output>
                       {selected.id === "procedural-lifeforms" && c.key === "shape"
-                        ? ["水母", "海葵", "鱼", "游丝"][params![c.key]]
+                        ? ["水母", "海葵", "鱼", "游丝", "干涉", "折叠"][params![c.key]]
                         : params![c.key]}
                       <small>{c.unit}</small>
                     </output>
