@@ -172,7 +172,7 @@ export const experiments: Experiment[] = [
     boundary:
       "这是二维程序化抽象，并非生物学准确的三维重建或物理流体模拟。上传图片仅估计前景宽高比，不包含语义识别、骨架拟合或真实 AI 评价。简洁背景的图片效果较佳。采用网格限流避免局部像素密集堆积，窄屏设备会降低绘制采样数；该约束不代表真实光能或物理密度。灵感来自 @yuruyurau，所有公式均独立实现。",
     controls: [
-      c("shape", "生命体类型（0 水母 / 1 海葵 / 2 鱼 / 3 游丝）", 0, 3),
+      c("shape", "生命体类型", 0, 3),
       c("count", "粒子总量", 6000, 50000, 1000),
       c("spread", "身体宽度", 0.5, 1.7, 0.05),
       c("length", "身体长度", 0.5, 1.7, 0.05),
@@ -188,7 +188,7 @@ export const experiments: Experiment[] = [
         pulse: 72, sway: 65, drift: 58, speed: 50, opacity: 79,
       } },
       { name: "游丝", values: {
-        shape: 3, count: 42000, spread: 1.15, length: 1,
+        shape: 3, count: 30000, spread: 1.15, length: 1,
         pulse: 65, sway: 75, drift: 24, speed: 50, opacity: 88,
       } },
       { name: "海葵", values: {
