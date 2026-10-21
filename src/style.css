@@ -1205,3 +1205,19 @@ footer i {
 @media (max-width: 390px) {
   .life-candidate-grid { grid-template-columns: 1fr; }
 }
+
+
+/* The lifeform workbench has more than three shape presets. */
+.preset-row.preset-lifeforms {
+  flex-wrap: wrap;
+  gap: 6px;
+  border: 0;
+  overflow: visible;
+}
+.preset-row.preset-lifeforms button,
+.preset-row.preset-lifeforms button + button {
+  flex: 1 0 calc(33.3% - 6px);
+  border: 1px solid #303640;
+  border-radius: 4px;
+  min-width: 62px;
+}

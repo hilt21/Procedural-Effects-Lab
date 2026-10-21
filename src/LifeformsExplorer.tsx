@@ -7,6 +7,7 @@ import {
   type MorphologyCandidate,
 } from "./effects/lifeforms-model";
 import { sampleLifeform } from "./effects/lifeforms-geometry";
+import { isInterferenceShape, paintInterference } from "./effects/lifeforms-interference";
 
 function Preview({ candidate }: { candidate: MorphologyCandidate }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -21,6 +22,11 @@ function Preview({ candidate }: { candidate: MorphologyCandidate }) {
     ctx.setTransform(2, 0, 0, 2, 0, 0);
     ctx.fillStyle = "#05070a";
     ctx.fillRect(0, 0, width, height);
+    if (isInterferenceShape(candidate.params.shape)) {
+      paintInterference(ctx, candidate.params, candidate.seed, 1.6,
+        width, height, 5500);
+      return;
+    }
     const n = Math.round(candidate.params.count);
     const samples = 5500;
     const scale = Math.min(width / 3.6, height / 3.2);

@@ -9,7 +9,7 @@ Explore, tune, and reproduce browser visual effects. A static React + TypeScript
 | Angular light trails | Canvas 2D | Exact 45° paths, directional persistence, viewport reflection, global and local geometry budgets |
 | Flow field particles | Canvas 2D | Seeded particles, procedural vector fields, cell occupancy, trails                               |
 | Chromatic drift      | WebGL     | Fullscreen fragment shader, color fields, warp, grain, static fallback                           |
-| Procedural lifeforms | Canvas 2D | Three original parametric lifeforms, looping motions, local particle budgets, and morphology search |
+| Procedural lifeforms | Canvas 2D | Original parametric and index-space mathematical organisms, looping motions, particle budgets, and morphology search |
 
 ## Procedural lifeforms
 
@@ -18,6 +18,17 @@ The fourth experiment contains three connected capabilities: deterministic, high
 Users may optionally select a local reference image. The browser estimates its foreground width-to-height ratio from color contrast with the corners. The photo is neither sent to a server nor embedded in URLs or JSON. It cannot recover anatomical structure, determine semantic species, or guarantee faithful reconstruction. Candidate scores are heuristic, not AI-generated aesthetic rankings. Low-contrast or cluttered images can fail, and the interface reports this.
 
 **Inspiration:** [@yuruyurau](https://x.com/yuruyurau?s=21) and the broader mathematical-generative-art tradition. All geometry and motion formulas here were independently written, with no copying of original sketch code.
+
+## Index-space interference studies (2026-10)
+
+Two additional specimens (**干涉** and **折叠**) derive an original mathematical point-map from a fixed index domain. All points are computed directly as functions of index, parameters, seed and time. Incommensurate spatial frequencies generate dense interference bands and organic folds; no hand-drawn model, texture, scene graph or fluid solver is needed.
+
+- The original index domain is preserved when level of detail decreases, so the whole form does not collapse into a truncated prefix.
+- The same painter is used in the real-time canvas and morphology candidate thumbnails.
+- Phase functions are commensurate with the shared 12-second animation period and explicitly tested at the loop seam.
+- Interference intentionally allows spatial overdraw; local particle rejection would erase its fine interference structure. Alpha compositing limits displayed channel values, and adaptive global sampling reduces frame cost.
+- They are **independently developed mathematical studies**, not licensed ports, source-code copies, or guaranteed pixel matches to any specific artist's sketch.
+- Reference reading: [@yuruyurau on X](https://x.com/yuruyurau?s=21), [generative sea creatures analysis](https://games.studio23.london/blog/generative-sea-creatures/). The artist has publicly expressed reservations about reuse and publishing copies. Attribution does not grant a license. Reproducing a specific sketch faithfully for public distribution would require clarification of permission.
 
 ## Development
 

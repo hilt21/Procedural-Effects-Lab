@@ -1,5 +1,6 @@
 import { clamp, type Factory } from "../core";
 import { sampleLifeform, LIFEFORM_PERIOD } from "./lifeforms-geometry";
+import { isInterferenceShape, paintInterference } from "./lifeforms-interference";
 
 type Dot = { x: number; y: number; alpha: number; radius: number };
 
@@ -21,6 +22,22 @@ export const create: Factory = (canvas, initial, initialSeed) => {
     ctx.fillStyle = "#05070a";
     ctx.fillRect(0, 0, w, h);
     const count = Math.min(Math.round(p.count), Math.round(dynamicCap));
+    if (isInterferenceShape(p.shape)) {
+      const m = paintInterference(ctx, p, seed, t, w, h, count);
+      visible = m.visible;
+      densityPeak = m.peak;
+      renderCost += performance.now() - start;
+      renderFrames++;
+      if (renderFrames >= 12) {
+        const ms = renderCost / renderFrames;
+        const limit = Math.min(p.count, w < 520 ? 18000 : 50000);
+        const factor = ms > 33 ? 0.82 : ms < 18 ? 1.08 : 1;
+        dynamicCap = clamp(Math.round(dynamicCap * factor), Math.min(8000, limit), limit);
+        renderCost = 0;
+        renderFrames = 0;
+      }
+      return;
+    }
     const scale = Math.min(w / 3.5, h / (Math.round(p.shape) === 2 ? 2.75 : 3.15));
     const angle = t * TAU / LIFEFORM_PERIOD, drift = p.drift / 100;
     const centerX = w * 0.5 + 0.16 * drift * scale * Math.sin(angle);
