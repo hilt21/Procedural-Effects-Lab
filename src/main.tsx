@@ -61,26 +61,32 @@ function Poster({ id }: { id: string }) {
           ))}
         </svg>
       ) : id === "procedural-lifeforms" ? (
-        <svg viewBox="0 0 400 230">
+        <svg viewBox="0 0 400 230" aria-hidden="true">
           <defs>
             <radialGradient id="life-glow">
-              <stop stopColor="#a1f5ed" stopOpacity=".2" />
+              <stop stopColor="#a1f5ed" stopOpacity=".16" />
               <stop offset="1" stopColor="#a1f5ed" stopOpacity="0" />
             </radialGradient>
           </defs>
-          <circle cx="200" cy="120" r="100" fill="url(#life-glow)" />
-          {Array.from({ length: 65 }, (_, i) => {
-            const x = 110 + i * 2.8;
-            const r = (x - 200) / 96;
-            const y = 120 - 55 * Math.sqrt(Math.max(0, 1 - r * r));
-            return <circle key={i} cx={x} cy={y} r="1.2" fill="#a4efe9"
-              opacity={.25 + .65 * Math.sin(i * 0.6) ** 2} />;
+          <circle cx="200" cy="115" r="105" fill="url(#life-glow)" />
+          {Array.from({ length: 88 }, (_, i) => {
+            const u = i / 87;
+            const x = 200 + 25 * Math.sin(u * 9);
+            const y = 25 + u * 180;
+            const r = 9 + 31 * Math.pow(Math.sin(Math.PI * u), .7);
+            return <ellipse key={i} cx={x} cy={y} rx={r} ry={r * .26}
+              transform={`rotate(${20 * Math.sin(u * 7)} ${x} ${y})`}
+              fill="none" stroke="#b5eeeb" strokeWidth=".55"
+              strokeOpacity={.18 + .25 * Math.sin(i * .2) ** 2}/>;
           })}
-          {Array.from({ length: 26 }, (_, i) => {
-            const x = 135 + i * 5;
-            return <path key={i} d={`M${x} 116 Q${x + Math.sin(i * 2) * 18} 165 ${x + Math.sin(i * 2.2) * 10} 211`}
-              fill="none" stroke="#a4efe9" strokeWidth={0.5 + (i % 4) * .2}
-              strokeOpacity={.25 + (i % 5) * .12} />;
+          {Array.from({ length: 42 }, (_, i) => {
+            const u = (i * .6180339) % 1;
+            const x = 200 + 25 * Math.sin(u * 9);
+            const y = 25 + u * 180;
+            const v = (i * .381966) % 1;
+            return <path key={i}
+              d={`M ${x} ${y} Q ${x + 64 * Math.sin(i)} ${y + 22} ${x + 120 * Math.cos(i * 1.2)} ${y + 55 * (v - .5)}`}
+              stroke="#b5eeeb" strokeWidth=".6" strokeOpacity=".37" fill="none"/>;
           })}
         </svg>
       ) : (
