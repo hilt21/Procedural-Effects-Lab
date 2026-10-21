@@ -42,3 +42,17 @@ A seeded LCG and a fixed simulation timestep provide repeatable CPU simulation a
 ## Deployment
 
 Vite emits a static `dist` with separate lazy effect chunks. Relative asset URLs permit subpath hosting. The Sites manifest declares `dist`; no server bindings or credentials are required. GitHub CI runs tests/build and retains the static artifact. It does not claim browser coverage or automatically publish to a second hosting provider.
+
+
+## Procedural lifeforms
+
+- `effects/lifeforms-model.ts`: pure seeded particle topology, independently authored jellyfish/anemone/fish morphology, 12-second periodic local deformation, closed global swim transform, deterministic quality-diversity candidate sampling, and simple image silhouette extraction.
+- `effects/lifeforms.ts`: independent Canvas 2D renderer with adaptive scale, DPR clamp, and a per-cell particle count cap.
+- `LifeformsExplorer.tsx`: local image decoding (max 8 MB), approximate foreground aspect-ratio extraction, candidate gallery, and apply-to-workbench.
+- Candidate choice updates only seed and validated parameter fields, so sharing/export reuses the existing snapshot format.
+- Image bytes and derived reference ratios are ephemeral local UI state; images never enter the URL, repository, or telemetry. Image analysis does not include semantic segmentation, skeletal extraction, or a learned perceptual model.
+- Inspiration: [@yuruyurau](https://x.com/yuruyurau?s=21); geometry and animations are independently authored. Avoid importing the author's original compressed mathematical sketches or claiming endorsement.
+
+### Verification constraints
+
+Tests cover seed determinism, morphology and swim loop closure, candidate diversity/bounds, snapshot round trips, and approximate silhouette extraction. They do not prove biological fidelity, aesthetic quality, actual GPU/mobile FPS, or cross-browser layout. Browser QA remains necessary.
