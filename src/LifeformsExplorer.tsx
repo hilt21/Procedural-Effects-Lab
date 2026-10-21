@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import type { Params } from "./core";
 import type { Snapshot } from "./registry";
 import {
-  createLifePoints, estimateShapeRatio, exploreMorphologies,
-  lifePosition, measureReferenceSilhouette, shapeNames,
+  estimateShapeRatio, exploreMorphologies,
+  measureReferenceSilhouette, shapeNames,
   type MorphologyCandidate,
 } from "./effects/lifeforms-model";
+import { sampleLifeform } from "./effects/lifeforms-geometry";
 
 function Preview({ candidate }: { candidate: MorphologyCandidate }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -18,19 +19,24 @@ function Preview({ candidate }: { candidate: MorphologyCandidate }) {
     el.width = width * 2;
     el.height = height * 2;
     ctx.setTransform(2, 0, 0, 2, 0, 0);
-    ctx.fillStyle = "#070d18";
+    ctx.fillStyle = "#05070a";
     ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = "#a6e9e5";
-    ctx.globalAlpha = 0.75;
-    const subset = createLifePoints({ ...candidate.params, count: 1100 }, candidate.seed);
-    for (const p of subset) {
-      const position = lifePosition(p, candidate.params, 1.6);
-      const scalar = 42;
-      const x = width / 2 + scalar * position.x;
-      const y = 57 + scalar * position.y;
-      if (x > 1 && x < width - 1 && y > 1 && y < height - 1)
-        ctx.fillRect(x, y, 1, 1);
+    const n = Math.round(candidate.params.count);
+    const samples = 5500;
+    const scale = Math.min(width / 3.6, height / 3.2);
+    for (let index = 0; index < samples; index++) {
+      const i = Math.floor(index * (n - 1) / (samples - 1));
+      const position = sampleLifeform(i, n, candidate.params, 1.6, candidate.seed);
+      const depth = Math.max(0, Math.min(1, (position.z + 1.15) / 2.3));
+      const parallax = 1 + position.z * 0.1;
+      const x = width / 2 + scale * position.x * parallax;
+      const y = height * .47 + scale * position.y * parallax;
+      if (x <= 1 || x >= width - 1 || y <= 1 || y >= height - 1) continue;
+      ctx.globalAlpha = (0.22 + depth * 0.65) * candidate.params.opacity / 100;
+      ctx.fillStyle = "#ebf5f4";
+      ctx.fillRect(x, y, 0.8, 0.8);
     }
+    ctx.globalAlpha = 1;
   }, [candidate]);
   return <canvas ref={canvas} className="life-candidate-preview" aria-hidden="true" />;
 }
