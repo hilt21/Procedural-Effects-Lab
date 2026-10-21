@@ -13,7 +13,7 @@ Explore, tune, and reproduce browser visual effects. A static React + TypeScript
 
 ## Procedural lifeforms
 
-The fourth experiment contains three connected capabilities: procedural morphology generation (jellyfish, anemone, fish), periodic local motion plus a closed global path, and seeded morphology exploration with a diversity-aware heuristic. Six generated candidates can be previewed and applied as normal shareable experiment parameters.
+The fourth experiment contains three connected capabilities: deterministic, high-density three-dimensional point-cloud morphology (jellyfish, anemone, fish, and a sinuous abstract organism), periodic local deformation plus a closed global path, and seeded morphology exploration with a diversity-aware heuristic. Six generated candidates can be previewed and applied as normal shareable experiment parameters.
 
 Users may optionally select a local reference image. The browser estimates its foreground width-to-height ratio from color contrast with the corners. The photo is neither sent to a server nor embedded in URLs or JSON. It cannot recover anatomical structure, determine semantic species, or guarantee faithful reconstruction. Candidate scores are heuristic, not AI-generated aesthetic rankings. Low-contrast or cluttered images can fail, and the interface reports this.
 
@@ -52,7 +52,7 @@ Share links and JSON contain schema version, effect ID, effect version, seed, an
 - Particle density is based on particle centers, not accumulated trail brightness. The vector field is procedural, not a physical fluid solver.
 - Shader code uses native WebGL without Three.js or R3F. Unsupported or lost WebGL contexts display a static CSS gradient.
 - DPR is capped at 1.5. The directory uses static posters and never runs all experiments at once.
-- Lifeform loops close at twelve seconds at 50% playback speed. Shape generation is two-dimensional and intentionally nonphysical; a per-cell particle cap limits visual accumulation. A selected photo is transient and does not persist across page reloads.
+- Lifeform loops close at twelve seconds at 50% playback speed. Shapes use procedural 3D coordinates projected onto a 2D canvas; no fluid simulation or anatomical reconstruction is involved. Adaptive sampling responds to measured render cost, so displayed point count may be below requested point count. A per-cell particle cap limits visual accumulation. A selected photo is transient and does not persist across page reloads.
 
 ## Verification
 
