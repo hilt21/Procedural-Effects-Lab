@@ -81,3 +81,11 @@ Tests cover seed determinism, morphology and swim loop closure, candidate divers
 - Shape 1 dispatches through the same alpha-accumulating `paintInterference` as jellyfish shape 0 and unchanged mathematical modes 4/5. The browser explorer uses exactly the same callback.
 - Old shape=1 URLs and JSON remain valid; the visible preset and selector labels change to 海葵·干涉. The 12-second loop, seed reproducibility, global LOD, topology coverage and real desktop/mobile canvas are tested by CI.
 - The model is independently authored; visual inspiration credit is retained for @yuruyurau without importing the author's exact sketches.
+
+## Interference fish swimmer replacement (shape=2)
+
+- `lifeforms-fish-field.ts` is a pure seeded index-to-2D sampler using three correlated domains: 58% bounded fish silhouette, 20% dorsal/ventral/pectoral folds and anatomical orientation cues, 22% split caudal fan and restrained wake.
+- Time-dependent harmonics share the 12-second period. Traveling wave amplitude rises toward the tail while head coordinates remain stable; the body, fins and tail are separately parameterized but rendered as one index-space field with alpha accumulation.
+- Shape=2 keeps old URL and JSON compatibility and uses the same `paintInterference` evaluator in workbench and morphology explorer. No new dependencies or browser uploads.
+- Existing jellyfish (0), anemone (1), interference (4) and folded (5) samplers are unchanged. Browser QA screens desktop and mobile fish scenes, six candidate thumbnails and regression checks.
+- All fish formulas are independently authored mathematical art; credit to @yuruyurau is for inspiration rather than a claim of affiliation or exact code reuse.
