@@ -48,7 +48,7 @@ const evaluate = async (expression) => {
   const r = await send("Runtime.evaluate",
     { expression, returnByValue: true, awaitPromise: true });
   if (r.exceptionDetails) throw Error("Evaluation failed: " +
-    (r.exceptionDetails.text || JSON.stringify(r.exceptionDetails)));
+    (r.exceptionDetails.exception?.description || r.exceptionDetails.text || JSON.stringify(r.exceptionDetails)));
   return r.result.value;
 };
 const until = async (expression, deadline = 8500) => {
@@ -131,17 +131,23 @@ try {
   if (!await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).some(b=>b.textContent.includes("干涉"))`))
     throw Error("Index-space presets were not found");
   await snap("desktop-interference.png");
+  await until(`Array.from(document.querySelectorAll('.preset-row button')).some(b=>b.textContent.includes("折叠"))`);
+  process.stdout.write("QA action: desktop fold\\n");
   await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("折叠")).click()`);
   await pause(750);
   metrics.fold = await geometry();
   if (!metrics.fold || metrics.fold.colored < 10) throw Error("Fold canvas is empty");
   await snap("desktop-fold.png");
+  await until(`Array.from(document.querySelectorAll('.preset-row button')).some(b=>b.textContent.includes("水母"))`);
+  process.stdout.write("QA action: jellyfish preset\\n");
   await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("水母")).click()`);
   await pause(850);
   metrics.jellyfishDesktop = await geometry();
   if (!metrics.jellyfishDesktop || metrics.jellyfishDesktop.colored < 10)
     throw Error("Replacement jellyfish canvas is visually empty");
   await snap("desktop-jellyfish-interference.png");
+  await until('document.querySelector(".life-primary") !== null');
+  process.stdout.write("QA action: explore candidates\\n");
   await evaluate('document.querySelector(".life-primary").click()');
   await until('document.querySelectorAll(".life-candidate").length === 6');
   metrics.jellyfishPreviews = await evaluate(`(() => {
@@ -156,13 +162,17 @@ try {
   })()`);
   if (metrics.jellyfishPreviews !== 6)
     throw Error("Jellyfish preview painter did not generate six visible candidates");
+  process.stdout.write("QA action: apply candidate\\n");
   await evaluate('document.querySelector(".life-candidate").click()');
   await until('document.querySelector(".notice") !== null');
   metrics.candidates = await evaluate('document.querySelectorAll(".life-candidate").length');
   await send("Emulation.setDeviceMetricsOverride",
     { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+  process.stdout.write("QA action: mobile reload\\n");
   await send("Page.reload");
   await until('document.querySelector(".stage canvas")?.width > 10');
+  await until(`Array.from(document.querySelectorAll('.preset-row button')).some(b=>b.textContent.includes("水母"))`);
+  process.stdout.write("QA action: jellyfish preset\\n");
   await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("水母")).click()`);
   await pause(850);
   metrics.mobile = await geometry();
@@ -172,6 +182,7 @@ try {
     throw Error("Mobile canvas has too few visible pixels");
   if (metrics.horizontalOverflow) throw Error("Mobile document overflows horizontally");
   await snap("mobile-jellyfish-interference.png");
+  process.stdout.write("QA action: mobile screenshot captured\\n");
   if (failures.length) throw Error("Browser console errors: " + failures.join(" | "));
   metrics.browser = version.Browser;
   metrics.ok = true;
