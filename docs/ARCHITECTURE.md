@@ -66,3 +66,11 @@ Tests cover seed determinism, morphology and swim loop closure, candidate divers
 - Spatial interference mode avoids local occupancy rejection to preserve bright folds, and uses alpha accumulation plus globally adaptive point count. Cell measurements are diagnostic, not a hard brightness constraint.
 - A constant normalized index domain prevents level-of-detail changes from altering global geometry. All runtime formula phases close after 12s, with tests for zero-to-period continuity.
 - The approach is an original mathematical implementation informed by general public creative coding mechanisms. Do not copy individual artists' formulas into this open-source project without appropriate permission.
+
+## Replacement of the jellyfish morphology (shape=0)
+
+- `lifeforms-jellyfish-field.ts` defines a pure index-to-2D-position sampler. Its bell is a ring-domain fold with several phase-coupled frequencies; folded oral ribbons and trailing thread families share the same mathematical index domain.
+- The existing `paintInterference` accepts an optional sampler. By default, interference/fold formulas remain unchanged, with exactly the same alpha as before. Shape 0 injects `jellyfishFieldPoint` and uses its per-layer alpha.
+- The display samples the entire fixed index range during performance-adaptive LOD. Brightness is limited via source-over alpha compositing; rejecting locally dense points would destroy the interference structure.
+- `shape=0` remains stable in links, imports and JSON. `LifeformsExplorer` previews call the same source sampler. No new external dependencies.
+- Explicit note: the model independently uses mathematical principles; it does not claim literal reproduction or license to reuse another artist's implementation.
