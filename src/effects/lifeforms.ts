@@ -3,6 +3,7 @@ import { sampleLifeform, LIFEFORM_PERIOD } from "./lifeforms-geometry";
 import { isInterferenceShape, paintInterference } from "./lifeforms-interference";
 import { jellyfishFieldPoint } from "./lifeforms-jellyfish-field";
 import { anemoneFieldPoint } from "./lifeforms-anemone-field";
+import { fishFieldPoint } from "./lifeforms-fish-field";
 
 type Dot = { x: number; y: number; alpha: number; radius: number };
 
@@ -24,9 +25,11 @@ export const create: Factory = (canvas, initial, initialSeed) => {
     ctx.fillStyle = "#05070a";
     ctx.fillRect(0, 0, w, h);
     const count = Math.min(Math.round(p.count), Math.round(dynamicCap));
-    if (p.shape === 0 || p.shape === 1 || isInterferenceShape(p.shape)) {
+    if (p.shape === 0 || p.shape === 1 || p.shape === 2 || isInterferenceShape(p.shape)) {
       const m = paintInterference(ctx, p, seed, t, w, h, count,
-        p.shape === 0 ? jellyfishFieldPoint : p.shape === 1 ? anemoneFieldPoint : undefined);
+        p.shape === 0 ? jellyfishFieldPoint :
+        p.shape === 1 ? anemoneFieldPoint :
+        p.shape === 2 ? fishFieldPoint : undefined);
       visible = m.visible;
       densityPeak = m.peak;
       renderCost += performance.now() - start;
