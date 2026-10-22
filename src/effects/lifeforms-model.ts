@@ -18,7 +18,7 @@ export type MorphologyCandidate = {
 
 export const PERIOD = 12;
 const TAU = Math.PI * 2;
-export const shapeNames = ["水母·干涉", "海葵", "鱼", "游丝", "干涉", "折叠"] as const;
+export const shapeNames = ["水母·干涉", "海葵·干涉", "鱼", "游丝", "干涉", "折叠"] as const;
 
 export function createLifePoints(params: Params, seed: number): LifePoint[] {
   const random = rng(seed);
@@ -143,7 +143,7 @@ export function swimTransform(seconds: number, params: Params) {
 export function estimateShapeRatio(params: Params) {
   const shape = Math.round(params.shape);
   if (shape === 0) return (1.85 * params.spread) / (0.7 + 1.0 * params.length);
-  if (shape === 1) return (1.35 * params.spread) / (0.4 + 1.4 * params.length);
+  if (shape === 1) return (1.45 * params.spread) / (1.15 * params.length);
   if (shape === 2) return (2.45 * params.spread) / (0.85 * params.length);
   if (shape === 4) return 0.8 * params.spread / params.length;
   if (shape === 5) return 1.5 * params.spread / params.length;
