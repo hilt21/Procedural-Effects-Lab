@@ -69,10 +69,11 @@ describe("shape=0 high fidelity index-space jellyfish", () => {
 
   it("uses identical shared painter geometry for preview and main render", () => {
     const rendered: Array<[number, number, number]> = [];
-    const ctx = {
+    const fake = {
       fillStyle: "", globalAlpha: 1,
-      fillRect(x: number, y: number) { rendered.push([x, y, this.globalAlpha]); },
-    } as unknown as CanvasRenderingContext2D;
+      fillRect(x: number, y: number) { rendered.push([x, y, fake.globalAlpha]); },
+    };
+    const ctx = fake as unknown as CanvasRenderingContext2D;
     const m = paintInterference(ctx, jellyfish, 84101, 1.6, 240, 150, 5500,
       jellyfishFieldPoint);
     expect(m.visible).toBeGreaterThan(1000);
@@ -86,10 +87,11 @@ describe("shape=0 high fidelity index-space jellyfish", () => {
 
   it("preserves the existing mathematical interference painter without a custom sampler", () => {
     const rendered: number[][] = [];
-    const ctx = {
+    const fake = {
       fillStyle: "", globalAlpha: 1,
-      fillRect(x: number, y: number) { rendered.push([x, y, this.globalAlpha]); },
-    } as unknown as CanvasRenderingContext2D;
+      fillRect(x: number, y: number) { rendered.push([x, y, fake.globalAlpha]); },
+    };
+    const ctx = fake as unknown as CanvasRenderingContext2D;
     const p = experiment.presets.find((x) => x.values.shape === 4)!.values;
     const count = Math.min(p.count, 6000);
     paintInterference(ctx, p, 23, 1.6, 300, 200, count);
