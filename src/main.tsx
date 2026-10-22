@@ -483,7 +483,7 @@ function App() {
                     {c.label}
                     <output>
                       {selected.id === "procedural-lifeforms" && c.key === "shape"
-                        ? ["水母·干涉", "海葵", "鱼", "游丝", "干涉", "折叠"][params![c.key]]
+                        ? ["水母·干涉", "海葵·干涉", "鱼", "游丝", "干涉", "折叠"][params![c.key]]
                         : params![c.key]}
                       <small>{c.unit}</small>
                     </output>
