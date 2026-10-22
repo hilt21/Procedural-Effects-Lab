@@ -13,7 +13,7 @@ Explore, tune, and reproduce browser visual effects. A static React + TypeScript
 
 ## Procedural lifeforms
 
-The fourth experiment contains three connected capabilities: deterministic, high-density index-space point fields (including a folded jellyfish) alongside three-dimensional point-cloud morphology (fish and a sinuous abstract organism); the anemone is now a folded index-space field, periodic local deformation plus a closed global path, and seeded morphology exploration with a diversity-aware heuristic. Six generated candidates can be previewed and applied as normal shareable experiment parameters.
+The fourth experiment contains three connected capabilities: deterministic, high-density index-space point fields (including a folded jellyfish) alongside three-dimensional point-cloud morphology (a sinuous abstract organism); both anemone and fish now use folded index-space fields, periodic local deformation plus a closed global path, and seeded morphology exploration with a diversity-aware heuristic. Six generated candidates can be previewed and applied as normal shareable experiment parameters.
 
 Users may optionally select a local reference image. The browser estimates its foreground width-to-height ratio from color contrast with the corners. The photo is neither sent to a server nor embedded in URLs or JSON. It cannot recover anatomical structure, determine semantic species, or guarantee faithful reconstruction. Candidate scores are heuristic, not AI-generated aesthetic rankings. Low-contrast or cluttered images can fail, and the interface reports this.
 
@@ -41,6 +41,12 @@ The field contains three intrinsically related index-space domains: 53% rippling
 ## High-density interference anemone (2026-10)
 
 The existing **`shape=1`** anemone has been replaced with a distinct mathematical point-field using the same renderer as the approved jellyfish, interference and folded field. Its three index regions are 35% breathing folded core, 22% short crown bands and 43% outward/upward filament families. Correlated six-fiber bundles form dense interference texture and phase-delayed movement without per-cell point rejection. Spatially complete adaptive LOD, 12-second closure, seed determinism and thumbnail/main-canvas parity are tested. The original `shape=1` ID and JSON keys are preserved, so saved URL configurations remain importable. The "干涉" and "折叠" formulas are unchanged. This is an independently written mathematical interpretation, credited to [@yuruyurau](https://x.com/yuruyurau?s=21) for creative inspiration, not a licensed reproduction.
+
+## Interference fish swimmer (2026-10)
+
+The existing **`shape=2`** fish now uses an independent index-space mathematical organism, rendering through the shared alpha-accumulating painter. Its shape is anchored by a coherent head-facing-right body axis while dense high-frequency folds give the surface its interference texture. Three domains form 58% tapered folded body, 20% dorsal / ventral / pectoral fins plus gill / eye detail, and 22% forked caudal fin and restrained wake. A stronger traveling wave reaches the tail before the head, preserving recognizability during the 12-second seamless loop.
+
+The main canvas and candidate gallery evaluate the exact same point sampler, with global index-domain LOD on mobile. Existing `shape=2` URLs, seeds, exported JSON and slider keys remain compatible. The accepted jellyfish, anemone, "干涉" and "折叠" formulas are untouched. The mathematics is independently authored, with inspiration credited to [@yuruyurau](https://x.com/yuruyurau?s=21) and no reuse of original sketches.
 
 ## Development
 
