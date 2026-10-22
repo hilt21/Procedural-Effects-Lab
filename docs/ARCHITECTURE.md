@@ -74,3 +74,10 @@ Tests cover seed determinism, morphology and swim loop closure, candidate divers
 - The display samples the entire fixed index range during performance-adaptive LOD. Brightness is limited via source-over alpha compositing; rejecting locally dense points would destroy the interference structure.
 - `shape=0` remains stable in links, imports and JSON. `LifeformsExplorer` previews call the same source sampler. No new external dependencies.
 - Explicit note: the model independently uses mathematical principles; it does not claim literal reproduction or license to reuse another artist's implementation.
+
+## Interference anemone replacement (shape=1)
+
+- `lifeforms-anemone-field.ts`: pure indexed generator with 35% compact folded core, 22% short crown fibers and 43% long outwardly radiating families. Multiple co-phased fiber lanes create a bundled appearance while delayed harmonics open and curl the crown.
+- Shape 1 dispatches through the same alpha-accumulating `paintInterference` as jellyfish shape 0 and unchanged mathematical modes 4/5. The browser explorer uses exactly the same callback.
+- Old shape=1 URLs and JSON remain valid; the visible preset and selector labels change to 海葵·干涉. The 12-second loop, seed reproducibility, global LOD, topology coverage and real desktop/mobile canvas are tested by CI.
+- The model is independently authored; visual inspiration credit is retained for @yuruyurau without importing the author's exact sketches.
