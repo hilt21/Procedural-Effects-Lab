@@ -192,6 +192,32 @@ try {
   await snap("desktop-anemone-candidates.png");
   await evaluate('document.querySelector(".life-candidate").click()');
   await pause(350);
+  await until(`Array.from(document.querySelectorAll('.preset-row button')).some(b=>b.textContent.includes("鱼·干涉"))`);
+  process.stdout.write("QA action: desktop fish interference\\n");
+  await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("鱼·干涉")).click()`);
+  await pause(950);
+  metrics.fishDesktop = await geometry();
+  if (!metrics.fishDesktop || metrics.fishDesktop.colored < 10)
+    throw Error("Fish interference canvas is visually empty");
+  await snap("desktop-fish-interference.png");
+  await evaluate('document.querySelector(".life-primary").click()');
+  await pause(550);
+  await until('document.querySelectorAll(".life-candidate canvas").length === 6');
+  metrics.fishPreviews = await evaluate(`(() => {
+    const canvases=Array.from(document.querySelectorAll(".life-candidate canvas"));
+    return canvases.filter(c=>{
+      const pix=c.getContext("2d").getImageData(0,0,c.width,c.height).data;
+      let hits=0;
+      for(let i=0;i<pix.length;i+=80)
+        if(pix[i]+pix[i+1]+pix[i+2]>110)hits++;
+      return hits>8;
+    }).length;
+  })()`);
+  if(metrics.fishPreviews!==6)
+    throw Error("Fish field did not create six visible candidate previews");
+  await snap("desktop-fish-candidates.png");
+  await evaluate('document.querySelector(".life-candidate").click()');
+  await pause(350);
   await send("Emulation.setDeviceMetricsOverride",
     { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   process.stdout.write("QA action: mobile reload\\n");
@@ -215,7 +241,14 @@ try {
   if (!metrics.anemoneMobile || metrics.anemoneMobile.colored < 4)
     throw Error("Mobile anemone field has too few bright pixels");
   await snap("mobile-anemone-interference.png");
-  process.stdout.write("QA action: mobile anemone screenshot captured\\n");
+  await until(`Array.from(document.querySelectorAll('.preset-row button')).some(b=>b.textContent.includes("鱼·干涉"))`);
+  await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("鱼·干涉")).click()`);
+  await pause(900);
+  metrics.fishMobile=await geometry();
+  if (!metrics.fishMobile || metrics.fishMobile.colored < 4)
+    throw Error("Mobile fish field is visually empty");
+  await snap("mobile-fish-interference.png");
+  process.stdout.write("QA action: mobile fish screenshot captured\\n");
   if (failures.length) throw Error("Browser console errors: " + failures.join(" | "));
   metrics.browser = version.Browser;
   metrics.ok = true;
