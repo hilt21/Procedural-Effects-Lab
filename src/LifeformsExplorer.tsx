@@ -9,6 +9,7 @@ import {
 import { sampleLifeform } from "./effects/lifeforms-geometry";
 import { isInterferenceShape, paintInterference } from "./effects/lifeforms-interference";
 import { jellyfishFieldPoint } from "./effects/lifeforms-jellyfish-field";
+import { anemoneFieldPoint } from "./effects/lifeforms-anemone-field";
 
 function Preview({ candidate }: { candidate: MorphologyCandidate }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -23,10 +24,11 @@ function Preview({ candidate }: { candidate: MorphologyCandidate }) {
     ctx.setTransform(2, 0, 0, 2, 0, 0);
     ctx.fillStyle = "#05070a";
     ctx.fillRect(0, 0, width, height);
-    if (candidate.params.shape === 0 || isInterferenceShape(candidate.params.shape)) {
+    if (candidate.params.shape === 0 || candidate.params.shape === 1 || isInterferenceShape(candidate.params.shape)) {
       paintInterference(ctx, candidate.params, candidate.seed, 1.6,
         width, height, 5500,
-        candidate.params.shape === 0 ? jellyfishFieldPoint : undefined);
+        candidate.params.shape === 0 ? jellyfishFieldPoint :
+        candidate.params.shape === 1 ? anemoneFieldPoint : undefined);
       return;
     }
     const n = Math.round(candidate.params.count);

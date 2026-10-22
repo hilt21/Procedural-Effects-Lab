@@ -166,6 +166,32 @@ try {
   await evaluate('document.querySelector(".life-candidate").click()');
   await until('document.querySelector(".notice") !== null');
   metrics.candidates = await evaluate('document.querySelectorAll(".life-candidate").length');
+  await until(`Array.from(document.querySelectorAll('.preset-row button')).some(b=>b.textContent.includes("海葵"))`);
+  process.stdout.write("QA action: desktop anemone interference\\n");
+  await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("海葵")).click()`);
+  await pause(950);
+  metrics.anemoneDesktop = await geometry();
+  if (!metrics.anemoneDesktop || metrics.anemoneDesktop.colored < 10)
+    throw Error("Anemone interference canvas is visually empty");
+  await snap("desktop-anemone-interference.png");
+  await evaluate('document.querySelector(".life-primary").click()');
+  await pause(550);
+  await until('document.querySelectorAll(".life-candidate canvas").length === 6');
+  metrics.anemonePreviews = await evaluate(`(() => {
+    const canvases = Array.from(document.querySelectorAll(".life-candidate canvas"));
+    return canvases.filter(c => {
+      const pix = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+      let hits = 0;
+      for (let i = 0; i < pix.length; i += 80)
+        if (pix[i] + pix[i+1] + pix[i+2] > 110) hits++;
+      return hits > 8;
+    }).length;
+  })()`);
+  if (metrics.anemonePreviews !== 6)
+    throw Error("Not all six anemone candidate previews are visible");
+  await snap("desktop-anemone-candidates.png");
+  await evaluate('document.querySelector(".life-candidate").click()');
+  await pause(350);
   await send("Emulation.setDeviceMetricsOverride",
     { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   process.stdout.write("QA action: mobile reload\\n");
@@ -182,7 +208,14 @@ try {
     throw Error("Mobile canvas has too few visible pixels");
   if (metrics.horizontalOverflow) throw Error("Mobile document overflows horizontally");
   await snap("mobile-jellyfish-interference.png");
-  process.stdout.write("QA action: mobile screenshot captured\\n");
+  await until(`Array.from(document.querySelectorAll('.preset-row button')).some(b=>b.textContent.includes("海葵"))`);
+  await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("海葵")).click()`);
+  await pause(900);
+  metrics.anemoneMobile = await geometry();
+  if (!metrics.anemoneMobile || metrics.anemoneMobile.colored < 4)
+    throw Error("Mobile anemone field has too few bright pixels");
+  await snap("mobile-anemone-interference.png");
+  process.stdout.write("QA action: mobile anemone screenshot captured\\n");
   if (failures.length) throw Error("Browser console errors: " + failures.join(" | "));
   metrics.browser = version.Browser;
   metrics.ok = true;
