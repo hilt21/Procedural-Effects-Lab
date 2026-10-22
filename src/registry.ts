@@ -200,7 +200,7 @@ export const experiments: Experiment[] = [
         pulse: 65, sway: 75, drift: 24, speed: 50, opacity: 88,
       } },
       { name: "海葵·干涉", values: {
-        shape: 1, count: 42000, spread: 1.12, length: 1.05,
+        shape: 1, count: 42000, spread: 1.10, length: 1.05,
         pulse: 62, sway: 86, drift: 14, speed: 50, opacity: 92,
       } },
       { name: "鱼", values: {
