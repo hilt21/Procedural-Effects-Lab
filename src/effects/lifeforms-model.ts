@@ -18,7 +18,7 @@ export type MorphologyCandidate = {
 
 export const PERIOD = 12;
 const TAU = Math.PI * 2;
-export const shapeNames = ["水母", "海葵", "鱼", "游丝", "干涉", "折叠"] as const;
+export const shapeNames = ["水母·干涉", "海葵", "鱼", "游丝", "干涉", "折叠"] as const;
 
 export function createLifePoints(params: Params, seed: number): LifePoint[] {
   const random = rng(seed);

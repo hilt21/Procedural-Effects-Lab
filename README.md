@@ -13,7 +13,7 @@ Explore, tune, and reproduce browser visual effects. A static React + TypeScript
 
 ## Procedural lifeforms
 
-The fourth experiment contains three connected capabilities: deterministic, high-density three-dimensional point-cloud morphology (jellyfish, anemone, fish, and a sinuous abstract organism), periodic local deformation plus a closed global path, and seeded morphology exploration with a diversity-aware heuristic. Six generated candidates can be previewed and applied as normal shareable experiment parameters.
+The fourth experiment contains three connected capabilities: deterministic, high-density index-space point fields (including a folded jellyfish) alongside three-dimensional point-cloud morphology (anemone, fish, and a sinuous abstract organism), periodic local deformation plus a closed global path, and seeded morphology exploration with a diversity-aware heuristic. Six generated candidates can be previewed and applied as normal shareable experiment parameters.
 
 Users may optionally select a local reference image. The browser estimates its foreground width-to-height ratio from color contrast with the corners. The photo is neither sent to a server nor embedded in URLs or JSON. It cannot recover anatomical structure, determine semantic species, or guarantee faithful reconstruction. Candidate scores are heuristic, not AI-generated aesthetic rankings. Low-contrast or cluttered images can fail, and the interface reports this.
 
@@ -29,6 +29,14 @@ Two additional specimens (**干涉** and **折叠**) derive an original mathemat
 - Interference intentionally allows spatial overdraw; local particle rejection would erase its fine interference structure. Alpha compositing limits displayed channel values, and adaptive global sampling reduces frame cost.
 - They are **independently developed mathematical studies**, not licensed ports, source-code copies, or guaranteed pixel matches to any specific artist's sketch.
 - Reference reading: [@yuruyurau on X](https://x.com/yuruyurau?s=21), [generative sea creatures analysis](https://games.studio23.london/blog/generative-sea-creatures/). The artist has publicly expressed reservations about reuse and publishing copies. Attribution does not grant a license. Reproducing a specific sketch faithfully for public distribution would require clarification of permission.
+
+## Jellyfish interference replacement (2026-10)
+
+The existing `shape=0` jellyfish preset now renders a new independently authored index-space field via `src/effects/lifeforms-jellyfish-field.ts`. It preserves existing URLs and JSON snapshots without adding parameters or changing schema versions. The former manually sculpted 3D shell is bypassed at runtime.
+
+The field contains three intrinsically related index-space domains: 53% rippling bell membrane, 24% folded oral ribbons, and 23% trailing filament families. Spatially coupled wave interference, phase delays and alpha accumulation create dense material texture without per-cell culling. All terms close after twelve simulated seconds. Adaptive sampling works across the *entire* stable index domain. The main renderer and candidate thumbnails call the same evaluator and painter.
+
+**The change is a visual reinterpretation, not a licensed recreation of any particular @yuruyurau animation.** Source sketches were not copied. Existing “干涉” and “折叠” shapes remain untouched.
 
 ## Development
 

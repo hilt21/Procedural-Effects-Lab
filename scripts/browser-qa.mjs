@@ -136,8 +136,26 @@ try {
   metrics.fold = await geometry();
   if (!metrics.fold || metrics.fold.colored < 10) throw Error("Fold canvas is empty");
   await snap("desktop-fold.png");
+  await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("水母")).click()`);
+  await pause(850);
+  metrics.jellyfishDesktop = await geometry();
+  if (!metrics.jellyfishDesktop || metrics.jellyfishDesktop.colored < 10)
+    throw Error("Replacement jellyfish canvas is visually empty");
+  await snap("desktop-jellyfish-interference.png");
   await evaluate('document.querySelector(".life-primary").click()');
   await until('document.querySelectorAll(".life-candidate").length === 6');
+  metrics.jellyfishPreviews = await evaluate(`(() => {
+    const canvases = Array.from(document.querySelectorAll(".life-candidate canvas"));
+    return canvases.filter(c => {
+      const pix = c.getContext("2d").getImageData(0,0,c.width,c.height).data;
+      let hits=0;
+      for (let i=0;i<pix.length;i+=80)
+        if (pix[i]+pix[i+1]+pix[i+2]>110) hits++;
+      return hits>8;
+    }).length;
+  })()`);
+  if (metrics.jellyfishPreviews !== 6)
+    throw Error("Jellyfish preview painter did not generate six visible candidates");
   await evaluate('document.querySelector(".life-candidate").click()');
   await until('document.querySelector(".notice") !== null');
   metrics.candidates = await evaluate('document.querySelectorAll(".life-candidate").length');
@@ -145,6 +163,7 @@ try {
     { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   await send("Page.reload");
   await until('document.querySelector(".stage canvas")?.width > 10');
+  await evaluate(`Array.from(document.querySelectorAll('.preset-row button')).find(b=>b.textContent.includes("水母")).click()`);
   await pause(850);
   metrics.mobile = await geometry();
   metrics.horizontalOverflow = await evaluate(
@@ -152,7 +171,7 @@ try {
   if (!metrics.mobile || metrics.mobile.colored < 4)
     throw Error("Mobile canvas has too few visible pixels");
   if (metrics.horizontalOverflow) throw Error("Mobile document overflows horizontally");
-  await snap("mobile-interference.png");
+  await snap("mobile-jellyfish-interference.png");
   if (failures.length) throw Error("Browser console errors: " + failures.join(" | "));
   metrics.browser = version.Browser;
   metrics.ok = true;

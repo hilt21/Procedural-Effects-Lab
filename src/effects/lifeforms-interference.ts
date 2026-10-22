@@ -64,6 +64,11 @@ export function interferencePoint(
   };
 }
 
+export type IndexedPointSampler = (
+  index: number, count: number, params: Params, seconds: number, seed: number,
+) => { x: number; y: number; alpha?: number };
+
+/** Shared alpha-accumulation painter for folded, interfering and jellyfish fields. */
 export function paintInterference(
   ctx: CanvasRenderingContext2D,
   params: Params,
@@ -72,6 +77,7 @@ export function paintInterference(
   width: number,
   height: number,
   budget: number,
+  sampler: IndexedPointSampler = interferencePoint,
 ) {
   const scale = 0.91 * Math.min(width, height) / 400;
   const phase = TAU * seconds / LIFEFORM_PERIOD;
@@ -89,10 +95,11 @@ export function paintInterference(
   const pointSize = Math.max(0.55, scale * 0.60);
   for (let j = 0; j < count; j++) {
     const idx = Math.round(j * (params.count - 1) / Math.max(1, count - 1));
-    const p = interferencePoint(idx, Math.round(params.count), params, seconds, seed);
+    const p = sampler(idx, Math.round(params.count), params, seconds, seed);
     const x = centerX + (p.x - 200) * scale;
     const y = centerY + (p.y - 200) * scale;
     if (x < 2 || y < 2 || x > width - 2 || y > height - 2) continue;
+    ctx.globalAlpha = 0.49 * params.opacity / 100 * (p.alpha ?? 1);
     ctx.fillRect(x, y, pointSize, pointSize);
     const col = Math.min(cols - 1, Math.floor(x / cell));
     const row = Math.min(rows - 1, Math.floor(y / cell));
